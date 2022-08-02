@@ -30,10 +30,10 @@ class StatsGen:
         self.debug = True
 
         # Stats dictionaries
-        self.stats_length = dict()
-        self.stats_simplemasks = dict()
-        self.stats_advancedmasks = dict()
-        self.stats_charactersets = dict()
+        self.stats_length = {}
+        self.stats_simplemasks = {}
+        self.stats_advancedmasks = {}
+        self.stats_charactersets = {}
 
         # Ignore stats with less than 1% coverage
         self.hiderare = False
@@ -63,32 +63,32 @@ class StatsGen:
         upper = 0
         special = 0
 
-        simplemask = list()
+        simplemask = []
         advancedmask_string = ""
 
         # Detect simple and advanced masks
         for letter in password:
- 
+         
             if letter in string.digits:
                 digit += 1
                 advancedmask_string += "?d"
-                if not simplemask or not simplemask[-1] == 'digit': simplemask.append('digit')
+                if not simplemask or simplemask[-1] != 'digit': simplemask.append('digit')
 
             elif letter in string.lowercase:
                 lower += 1
                 advancedmask_string += "?l"
-                if not simplemask or not simplemask[-1] == 'string': simplemask.append('string')
+                if not simplemask or simplemask[-1] != 'string': simplemask.append('string')
 
 
             elif letter in string.uppercase:
                 upper += 1
                 advancedmask_string += "?u"
-                if not simplemask or not simplemask[-1] == 'string': simplemask.append('string')
+                if not simplemask or simplemask[-1] != 'string': simplemask.append('string')
 
             else:
                 special += 1
                 advancedmask_string += "?s"
-                if not simplemask or not simplemask[-1] == 'special': simplemask.append('special')
+                if not simplemask or simplemask[-1] != 'special': simplemask.append('special')
 
 
         # String representation of masks
@@ -98,22 +98,20 @@ class StatsGen:
         policy = (digit,lower,upper,special)
 
         # Determine character-set
-        if   digit and not lower and not upper and not special: charset = 'numeric'
+        if digit and not lower and not upper and not special: charset = 'numeric'
         elif not digit and lower and not upper and not special: charset = 'loweralpha'
         elif not digit and not lower and upper and not special: charset = 'upperalpha'
         elif not digit and not lower and not upper and special: charset = 'special'
-
         elif not digit and lower and upper and not special:     charset = 'mixedalpha'
         elif digit and lower and not upper and not special:     charset = 'loweralphanum'
         elif digit and not lower and upper and not special:     charset = 'upperalphanum'
-        elif not digit and lower and not upper and special:     charset = 'loweralphaspecial'
-        elif not digit and not lower and upper and special:     charset = 'upperalphaspecial'
-        elif digit and not lower and not upper and special:     charset = 'specialnum'
-
-        elif not digit and lower and upper and special:         charset = 'mixedalphaspecial'
-        elif digit and not lower and upper and special:         charset = 'upperalphaspecialnum'
-        elif digit and lower and not upper and special:         charset = 'loweralphaspecialnum'
-        elif digit and lower and upper and not special:         charset = 'mixedalphanum'
+        elif not digit and lower and not upper:     charset = 'loweralphaspecial'
+        elif not digit and not lower and upper:     charset = 'upperalphaspecial'
+        elif digit and not lower and not upper:     charset = 'specialnum'
+        elif not digit and lower:         charset = 'mixedalphaspecial'
+        elif digit and not lower:         charset = 'upperalphaspecialnum'
+        elif digit and not upper:         charset = 'loweralphaspecialnum'
+        elif digit and not special:         charset = 'mixedalphanum'
         else:                                                   charset = 'all'
 
         return (pass_length, charset, simplemask_string, advancedmask_string, policy)
@@ -133,24 +131,28 @@ class StatsGen:
                 (pass_length,characterset,simplemask,advancedmask, policy) = self.analyze_password(password)
                 (digit,lower,upper,special) = policy
 
-                if (self.charsets == None    or characterset in self.charsets) and \
-                   (self.simplemasks == None or simplemask in self.simplemasks) and \
-                   (self.maxlength == None   or pass_length <= self.maxlength) and \
-                   (self.minlength == None   or pass_length >= self.minlength):
+                if (
+                    (self.charsets is None or characterset in self.charsets)
+                    and (
+                        self.simplemasks is None or simplemask in self.simplemasks
+                    )
+                    and (self.maxlength is None or pass_length <= self.maxlength)
+                    and (self.minlength is None or pass_length >= self.minlength)
+                ):
 
                     self.filter_counter += 1
 
-                    if self.mindigit == None or digit < self.mindigit: self.mindigit = digit
-                    if self.maxdigit == None or digit > self.maxdigit: self.maxdigit = digit
+                    if self.mindigit is None or digit < self.mindigit: self.mindigit = digit
+                    if self.maxdigit is None or digit > self.maxdigit: self.maxdigit = digit
 
-                    if self.minupper == None or upper < self.minupper: self.minupper = upper
-                    if self.maxupper == None or upper > self.maxupper: self.maxupper = upper
+                    if self.minupper is None or upper < self.minupper: self.minupper = upper
+                    if self.maxupper is None or upper > self.maxupper: self.maxupper = upper
 
-                    if self.minlower == None or lower < self.minlower: self.minlower = lower
-                    if self.maxlower == None or lower > self.maxlower: self.maxlower = lower
+                    if self.minlower is None or lower < self.minlower: self.minlower = lower
+                    if self.maxlower is None or lower > self.maxlower: self.maxlower = lower
 
-                    if self.minspecial == None or special < self.minspecial: self.minspecial = special
-                    if self.maxspecial == None or special > self.maxspecial: self.maxspecial = special
+                    if self.minspecial is None or special < self.minspecial: self.minspecial = special
+                    if self.maxspecial is None or special > self.maxspecial: self.maxspecial = special
 
                     if pass_length in self.stats_length:
                         self.stats_length[pass_length] += 1

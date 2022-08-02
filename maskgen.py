@@ -21,7 +21,7 @@ VERSION = "0.0.3"
 class MaskGen:
     def __init__(self):
         # Masks collections with meta data
-        self.masks = dict()
+        self.masks = {}
 
         self.target_time = None
         self.output_file = None
@@ -83,16 +83,30 @@ class MaskGen:
             self.total_occurrence += mask_occurrence
 
             # Apply filters based on occurrence, length, complexity and time
-            if (self.minoccurrence == None or mask_occurrence >= self.minoccurrence) and \
-               (self.maxoccurrence == None or mask_occurrence <= self.maxoccurrence) and \
-               (self.mincomplexity == None or mask_complexity >= self.mincomplexity) and \
-               (self.maxcomplexity == None or mask_complexity <= self.maxcomplexity) and \
-               (self.mintime == None or mask_time >= self.mintime) and \
-               (self.maxtime == None or mask_time <= self.maxtime) and \
-               (self.maxlength == None or mask_length <= self.maxlength) and \
-               (self.minlength == None or mask_length >= self.minlength):
+            if (
+                (
+                    self.minoccurrence is None
+                    or mask_occurrence >= self.minoccurrence
+                )
+                and (
+                    self.maxoccurrence is None
+                    or mask_occurrence <= self.maxoccurrence
+                )
+                and (
+                    self.mincomplexity is None
+                    or mask_complexity >= self.mincomplexity
+                )
+                and (
+                    self.maxcomplexity is None
+                    or mask_complexity <= self.maxcomplexity
+                )
+                and (self.mintime is None or mask_time >= self.mintime)
+                and (self.maxtime is None or mask_time <= self.maxtime)
+                and (self.maxlength is None or mask_length <= self.maxlength)
+                and (self.minlength is None or mask_length >= self.minlength)
+            ):
 
-                self.masks[mask] = dict()
+                self.masks[mask] = {}
                 self.masks[mask]['length'] = mask_length
                 self.masks[mask]['occurrence'] = mask_occurrence
                 self.masks[mask]['complexity'] = 1 - mask_complexity
